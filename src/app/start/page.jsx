@@ -48,10 +48,6 @@ export default function StartPage() {
               <strong>Copy/Paste &amp; Context Menu:</strong> Blocked &amp;
               logged
             </li>
-            <li>
-              <strong>After submission:</strong> View score, then auto-redirect
-              home
-            </li>
           </ul>
 
           <div className="mt-8 flex justify-center">
