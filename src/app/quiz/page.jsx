@@ -21,18 +21,31 @@ export default function QuizPage() {
   const timerRef = useRef(null)
 
   // 1. Fetch and shuffle exactly 50 questions on mount
-  useEffect(() => {
-    async function fetchQs() {
-      try {
-        const res = await fetch('/api/questions')
-        const data = await res.json()
-        setQuestions(shuffleQuestions(data).slice(0, 50))
-      } catch (err) {
-        console.error('Failed to load questions:', err)
-      }
+useEffect(() => {
+  async function fetchQs() {
+    try {
+      // Read branch cookie set during signup
+      const branch = getCookie('branch')?.trim() || ''
+
+      // Build the URL     /api/questions?branch=Chemical
+      const url = branch
+        ? `/api/questions?branch=${encodeURIComponent(branch)}`
+        : '/api/questions'
+
+      const res  = await fetch(url)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+
+      // Server returns every match; shuffle + slice here (keeps your old logic)
+      setQuestions(shuffleQuestions(data).slice(0, 50))
+
+      console.log(`🌐 fetched ${data.length} docs for branch "${branch}"`)
+    } catch (err) {
+      console.error('Failed to load questions:', err)
     }
-    fetchQs()
-  }, [])
+  }
+  fetchQs()
+}, [])
 
   // 2. Start countdown once questions are loaded (and not yet submitted)
   useEffect(() => {
@@ -120,32 +133,44 @@ export default function QuizPage() {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [warningGiven, isSubmitted])
 
-  // 7. Block copy/paste/contextmenu and count copyAttempts
-  useEffect(() => {
-    if (isSubmitted) return
+// 7. Block copy/paste/contextmenu and count copyAttempts
+useEffect(() => {
+  if (isSubmitted) return
 
-    const blockKeys = (e) => {
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        ['c', 'v', 'x', 'u'].includes(e.key.toLowerCase())
-      ) {
-        e.preventDefault()
-        setCopyAttempts((c) => c + 1)
-      }
-    }
+  const inc = () => setCopyAttempts(c => c + 1)
 
-    const blockCtx = (e) => {
+  const blockKeys = (e) => {
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      ['c', 'v', 'x', 'u'].includes(e.key.toLowerCase())
+    ) {
       e.preventDefault()
-      setCopyAttempts((c) => c + 1)
+      inc()
     }
+  }
 
-    document.addEventListener('keydown', blockKeys)
-    document.addEventListener('contextmenu', blockCtx)
-    return () => {
-      document.removeEventListener('keydown', blockKeys)
-      document.removeEventListener('contextmenu', blockCtx)
-    }
-  }, [isSubmitted])
+  const blockCtx = (e) => { e.preventDefault(); inc() }
+
+// mobile / generic:
+ const blockClipboard = (e) => { e.preventDefault(); inc() }
+ const blockSelect    = (e) => { e.preventDefault(); inc() }
+
+  document.addEventListener('keydown',       blockKeys)
+  document.addEventListener('contextmenu',   blockCtx)
+  document.addEventListener('copy',          blockClipboard)
+  document.addEventListener('cut',           blockClipboard)
+  document.addEventListener('paste',         blockClipboard)
+  document.addEventListener('selectstart',   blockSelect)
+
+  return () => {
+    document.removeEventListener('keydown',       blockKeys)
+    document.removeEventListener('contextmenu',   blockCtx)
+   document.removeEventListener('copy',          blockClipboard)
+   document.removeEventListener('cut',           blockClipboard)
+   document.removeEventListener('paste',         blockClipboard)
+   document.removeEventListener('selectstart',   blockSelect)
+  }
+}, [isSubmitted])
 
   // 8. Show a loading screen while questions are fetching
   if (!questions.length) {
@@ -163,7 +188,7 @@ export default function QuizPage() {
   const progWidth = `${((1800 - timeLeft) / 1800) * 100}%`
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#64126D] p-4 sm:p-8">
+      <div className="quiz-root min-h-screen flex items-center justify-center bg-[#64126D] p-4 sm:p-8">
       {/* Warning Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
