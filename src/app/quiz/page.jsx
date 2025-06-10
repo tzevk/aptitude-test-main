@@ -10,7 +10,7 @@ export default function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState('')
   const [answers, setAnswers] = useState({})           // { questionIndex: chosenOption, … }
-  const [timeLeft, setTimeLeft] = useState(1800)        // 30 minutes = 1800s
+  const [timeLeft, setTimeLeft] = useState(3000)        // 30 minutes = 1800s
   const [warningGiven, setWarningGiven] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [tabSwitchDetected, setTabSwitchDetected] = useState(false)
@@ -185,7 +185,7 @@ useEffect(() => {
   const current = questions[currentIndex]
   const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0')
   const seconds = String(timeLeft % 60).padStart(2, '0')
-  const progWidth = `${((1800 - timeLeft) / 1800) * 100}%`
+  const progWidth = `${((3000 - timeLeft) / 3000) * 100}%`
 
   return (
       <div className="quiz-root min-h-screen flex items-center justify-center bg-[#64126D] p-4 sm:p-8">
