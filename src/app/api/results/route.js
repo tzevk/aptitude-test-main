@@ -1,4 +1,3 @@
-// app/api/results/route.js
 import clientPromise from '@/lib/mongodb'
 import { NextResponse } from 'next/server'
 
@@ -31,19 +30,30 @@ export async function POST(req) {
       )
     }
 
-    const { name, phone, branch, college } = user
+    // Destructure everything you need from the user doc
+    const {
+      name,
+      phone,
+      college,
+      branch,
+      cgpa,
+      graduationyear
+    } = user
 
+    // Insert a new result document
     await results.insertOne({
       name,
       email,
       phone,
       college,
       branch,
+      cgpa,
+      graduationyear,
       score,
       attempts,
       timestamp,
-      tabSwitch: !!tabSwitch,           // convert to boolean
-      copyAttempts: copyAttempts || 0   // default to 0
+      tabSwitch: !!tabSwitch,           // ensure boolean
+      copyAttempts: copyAttempts || 0   // default 0
     })
 
     return NextResponse.json({ success: true })
