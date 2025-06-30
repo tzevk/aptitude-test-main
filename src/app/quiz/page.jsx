@@ -20,32 +20,29 @@ export default function QuizPage() {
   const router = useRouter()
   const timerRef = useRef(null)
 
-  // 1. Fetch and shuffle exactly 50 questions on mount
 useEffect(() => {
   async function fetchQs() {
     try {
-      // Read branch cookie set during signup
-      const branch = getCookie('branch')?.trim() || ''
-
-      // Build the URL     /api/questions?branch=Chemical
+      const branch = getCookie('branch')?.trim() || '';
       const url = branch
         ? `/api/questions?branch=${encodeURIComponent(branch)}`
-        : '/api/questions'
+        : '/api/questions';
 
-      const res  = await fetch(url)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
 
-      // Server returns every match; shuffle + slice here (keeps your old logic)
-      setQuestions(shuffleQuestions(data).slice(0, 50))
+      const shuffled = shuffleQuestions(data).slice(0, 50);
+      console.log("✅ Shuffled Questions:", shuffled.map(q => q._id || q.question));
 
-      console.log(`🌐 fetched ${data.length} docs for branch "${branch}"`)
+      setQuestions([...shuffled]); // ensure re-render
     } catch (err) {
-      console.error('Failed to load questions:', err)
+      console.error('Failed to load questions:', err);
     }
   }
-  fetchQs()
-}, [])
+
+  fetchQs();
+}, []);
 
   // 2. Start countdown once questions are loaded (and not yet submitted)
   useEffect(() => {
