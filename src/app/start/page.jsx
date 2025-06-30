@@ -32,7 +32,7 @@ export default function StartPage() {
               <strong>Questions:</strong> 50
             </li>
             <li>
-              <strong>Time Limit:</strong> 30 minutes
+              <strong>Time Limit:</strong> 60 minutes
             </li>
             <li>
               <strong>Navigation:</strong> Next &amp; Previous
@@ -40,8 +40,8 @@ export default function StartPage() {
             <li>
               <strong>Tab Switching:</strong>
               <ul className="list-disc list-inside ml-5 text-gray-600">
-                <li>1st switch: Warning</li>
-                <li>2nd switch: Quiz ends immediately</li>
+                <li>1st switch: <strong>Warning</strong></li>
+                <li>2nd switch: <strong>Quiz ends immediately</strong></li>
               </ul>
             </li>
             <li>
